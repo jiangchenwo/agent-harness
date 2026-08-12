@@ -2,3 +2,5 @@ user-docs/
 
 .claude/
 CLAUDE.md
+# skill eval workspaces
+skills/*-workspace/
