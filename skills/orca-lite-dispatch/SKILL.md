@@ -26,15 +26,20 @@ relay protocol.
 
 `worktree create --agent codex` cannot pass model or effort flags, and
 `orca orchestration worker-start --effort` rejects `max`. Launch through a plain
-terminal instead:
+terminal instead. When a coordinating session delegates the work, make the
+worktree a child of the current repo so its branch traces back to the parent;
+pass `--no-parent` only for a standalone run unrelated to the caller.
 
 ```text
-ORCA worktree create --name <task-name> --no-parent --json
+ORCA worktree create --name <task-name> --repo id:<repoId> --parent-worktree active --json
 ORCA terminal create --worktree id:<repoId>::<newWorktreePath> --title <task-name> \
   --command 'codex --dangerously-bypass-approvals-and-sandbox -m gpt-5.6-luna -c model_reasoning_effort=max' --json
 ORCA terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json
 ORCA terminal send --terminal <handle> --text "<brief>" --enter --json
 ```
+
+A delegated run gets its verification and merge from the coordinating session,
+not from here. This skill stays mechanism only.
 
 ## Launch a claude worker
 
