@@ -26,28 +26,56 @@ relay protocol.
 
 `worktree create --agent codex` cannot pass model or effort flags, and
 `orca orchestration worker-start --effort` rejects `max`. Launch through a plain
-terminal instead. When a coordinating session delegates the work, make the
-worktree a child of the current repo so its branch traces back to the parent;
-pass `--no-parent` only for a standalone run unrelated to the caller.
+terminal instead.
+
+Default to the current worktree: no new checkout, no new branch, and the
+worker's diff lands where the coordinator already sits.
 
 ```text
-ORCA worktree create --name <task-name> --repo id:<repoId> --parent-worktree active --json
-ORCA terminal create --worktree id:<repoId>::<newWorktreePath> --title <task-name> \
+ORCA terminal create --worktree active --title <task-name> \
   --command 'codex --dangerously-bypass-approvals-and-sandbox -m gpt-5.6-luna -c model_reasoning_effort=max' --json
 ORCA terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json
 ORCA terminal send --terminal <handle> --text "<brief>" --enter --json
 ```
 
-A delegated run gets its verification and merge from the coordinating session,
-not from here. This skill stays mechanism only.
+While a worker runs in the coordinator's worktree, the coordinator must not
+edit files there; reading is fine.
+
+Create a child worktree only when the run needs isolation: two workers must
+edit the same repo at once, the coordinator keeps editing while the worker
+runs, the working tree holds unrelated uncommitted changes, or the user asks
+for a branch. Then create the checkout first and point the terminal at it:
+
+```text
+ORCA worktree create --name <task-name> --repo id:<repoId> --parent-worktree active --json
+ORCA terminal create --worktree id:<repoId>::<newWorktreePath> --title <task-name> \
+  --command '<same codex argv>' --json
+```
+
+Pass `--no-parent` instead of `--parent-worktree active` only for a standalone
+run unrelated to the caller.
+
+A delegated run gets its verification and merge or commit from the
+coordinating session, not from here. This skill stays mechanism only.
 
 ## Launch a claude worker
+
+Same default, a terminal in the current worktree:
+
+```text
+ORCA terminal create --worktree active --title <task-name> --command 'claude' --json
+ORCA terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json
+ORCA terminal send --terminal <handle> --text "<brief>" --enter --json
+```
+
+Only when the run needs its own checkout (same tests as above):
 
 ```text
 ORCA worktree create --name <task-name> --agent claude --prompt "<brief>" --json
 ```
 
-Use `startupTerminal.handle` from the create response as the one and only handle.
+Use `startupTerminal.handle` from the create response as the one and only
+handle; do not also `terminal create` an agent in that worktree.
 
 ## Brief contract
 
@@ -74,8 +102,10 @@ Alternate between workers; never block indefinitely on one while the other is id
 
 ## Pitfalls
 
-- Always pass an explicit `--worktree` selector. A bare `current` resolves from the
-  coordinator's own process, not the worker's checkout, and targets the wrong tree.
+- `--worktree active` is right only when launching into the coordinator's own
+  worktree. For a worker in any other checkout, pass its explicit selector; a bare
+  `current` or `active` resolves from the coordinator's process and targets the
+  wrong tree.
 - On `terminal_handle_stale`, reacquire the handle with `terminal list` and continue
   with the replacement only; never send to both the old and new handle.
 - `terminal read` before `terminal send` unless the next input is obvious; a prompt
