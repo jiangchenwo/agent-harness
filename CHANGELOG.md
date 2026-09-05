@@ -3,6 +3,18 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.1] - 2026-09-05
+
+### Changed
+
+- `orca-lite-dispatch`: re-checked every recipe against Orca 1.4.197 and its
+  `skills get orca-cli` guide. The skill now resolves the `ORCA` executable the
+  way the updated `orca-cli` stub does, reads the agent handle from
+  `agentTerminalHandle` with `startupTerminal.handle` as the older fallback,
+  and no longer claims `worker-start --effort` rejects `max`. The terminal
+  launch path stays because `worker-start` needs a Task Run. Pitfalls gained
+  the fallback shell a bare `worktree create` can leave and the `--focus` flag.
+
 ## [0.3.0] - 2026-09-05
 
 ### Added
