@@ -1,18 +1,31 @@
 # Claude prompting best practices (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices
-- Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source; fetch it when you need full SDK code samples or exact XML example blocks, which this condensation omits.
-- Covers: all current Claude models (Claude Fable 5, Mythos 5, Opus 5, Opus 4.8/4.7/4.6, Sonnet 5, Sonnet 4.6, Haiku 4.5). Model-specific deltas live in the sibling `claude-*.md` files.
+- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source; fetch it when you need full SDK code samples or exact XML example blocks, which this condensation omits.
+- Covers: techniques that apply across all current Claude models (Claude Fable 5.1, Mythos 5.1, Fable 5, Mythos 5, Opus 5, Opus 4.8/4.7/4.6, Sonnet 5, Sonnet 4.6, Haiku 4.5). The page points to separate per-model guides for model-specific behavior.
 
 ## Contents
 
-1. General principles
-2. Output and formatting
-3. Tool use
-4. Thinking and reasoning
-5. Agentic systems
-6. Capability-specific tips
-7. Migration considerations
+1. Model-specific guidance
+2. General principles
+3. Output and formatting
+4. Tool use
+5. Thinking and reasoning
+6. Agentic systems
+7. Capability-specific tips
+8. Migration considerations
+
+## Model-specific guidance
+
+Each of these models has its own prompting page. The page says to read the one for your model first, then the techniques that follow. Where a technique names a specific model, treat it as measured on that model and re-check it against your own evals before applying it to another.
+
+| Model | What the page says is different |
+|---|---|
+| Claude Fable 5.1 and Mythos 5.1 | From Fable 5: effort levels, finishing long tasks, user-facing progress updates, passing thinking blocks back unchanged, tool-call batching in agent loops, search triggering at low effort, formatting, and writing density. |
+| Claude Fable 5 and Mythos 5 | From Opus 4.8: effort levels, instruction following, long-run progress claims, memory systems, and the `reasoning_extraction` refusal category. |
+| Claude Sonnet 5 | From Sonnet 4.6: response length, effort and thinking-depth calibration, tool use triggering, literal instruction following, and design and frontend defaults. |
+| Claude Opus 5 | From prior Opus models: response length and verbosity, user-facing progress updates, written deliverable length, task scope and over-verification, subagent control, and self-correction. |
+| Claude Opus 4.8 | Response length, effort and thinking-depth calibration, tool use triggering, literal instruction following, subagent control, and design and frontend defaults. |
 
 ## General principles
 
@@ -36,14 +49,14 @@
 
 ## Output and formatting
 
-**Communication style.** Current models are more direct and grounded, more conversational, and less verbose than previous generations; they may skip summaries after tool calls. For more visibility: "After completing a task that involves tool use, provide a quick summary of the work you've done." Exception: Claude Opus 5's user-facing responses run longer by default, and effort does not reliably change visible response length. Prompt explicitly for conciseness (see `claude-opus-5.md`).
+**Communication style.** Current models are more direct and grounded, more conversational, and less verbose than previous generations; they may skip summaries after tool calls. For more visibility: "After completing a task that involves tool use, provide a quick summary of the work you've done." Exception: Claude Opus 5's user-facing responses run longer by default, and effort does not reliably change visible response length. Prompt explicitly for conciseness; the page links to the Opus 5 prompting guide for the details.
 
 **Control response format.** Four techniques, in order of usefulness:
 
 1. Tell Claude what to do instead of what not to do ("Your response should be composed of smoothly flowing prose paragraphs," not "Do not use markdown").
 2. Use XML format indicators ("Write the prose sections in `<smoothly_flowing_prose_paragraphs>` tags").
 3. Match your prompt style to the desired output: removing markdown from your prompt reduces markdown in the output.
-4. For fine control, give detailed guidance. The official sample wraps it in `<avoid_excessive_markdown_and_bullet_points>` tags: write long-form content in flowing prose with complete paragraphs; reserve markdown for inline code, code blocks, and simple headings; avoid bold/italics; no ordered or unordered lists unless the items are truly discrete or the user asked; never output a series of overly short bullet points.
+4. For fine control, give detailed guidance. The official sample wraps it in `<avoid_excessive_markdown_and_bullet_points>` tags: write long-form content in flowing prose with complete paragraphs; reserve markdown for inline code, code blocks, and simple headings; avoid bold/italics; no ordered or unordered lists unless the items are truly discrete or the user asked; never output a series of overly short bullet points. Claude Fable 5.1 already formats less than earlier models, so on that model a block like this can suppress structure the content needs; remove it, or replace it with the shorter rule in the Fable 5.1 guide's "Formatting in chat" section.
 
 **LaTeX.** Current models default to LaTeX for math. For plain text: "Format your response in plain text only. Do not use LaTeX, MathJax, or any markup notation such as \( \), $, or \frac{}{}. Write all math expressions using standard text characters."
 
@@ -63,7 +76,7 @@
 
 **Dial back aggressive triggering language.** Claude Opus 4.5 and 4.6 are more responsive to the system prompt; prompts written to fix undertriggering ("CRITICAL: You MUST use this tool when...") now overtrigger. Use normal register: "Use this tool when...".
 
-**Parallel tool calls.** Current models run independent tool calls in parallel by default (speculative searches, multi-file reads, parallel bash). To push toward ~100%, the official `<use_parallel_tool_calls>` sample: "If you intend to call multiple tools and there are no dependencies between the tool calls, make all of the independent tool calls in parallel... However, if some tool calls depend on previous calls to inform dependent values like the parameters, do NOT call these tools in parallel and instead call them sequentially. Never use placeholders or guess missing parameters in tool calls." To reduce it: "Execute operations sequentially with brief pauses between each step to ensure stability."
+**Parallel tool calls.** Current models run independent tool calls in parallel by default (speculative searches, multi-file reads, parallel bash). To push toward ~100%, the official `<use_parallel_tool_calls>` sample: "If you intend to call multiple tools and there are no dependencies between the tool calls, make all of the independent tool calls in parallel... However, if some tool calls depend on previous calls to inform dependent values like the parameters, do NOT call these tools in parallel and instead call them sequentially. Never use placeholders or guess missing parameters in tool calls." To reduce it: "Execute operations sequentially with brief pauses between each step to ensure stability." On Claude Fable 5.1 in long agent loops, send the parallel-calls instruction as a turn-scoped system message after each round of tool results (the Fable 5.1 guide's "Batch independent tool calls in agent loops" section).
 
 ## Thinking and reasoning
 
@@ -73,7 +86,7 @@
 
 - Opus 4.6 through Opus 4.8 and Sonnet 4.6: thinking is **off** when the `thinking` parameter is omitted; enable adaptive thinking with `thinking: {type: "adaptive"}`.
 - Opus 5 and Sonnet 5: thinking is **on** by default; on Opus 5 it can be disabled only at effort `high` or lower.
-- Fable 5 and Mythos 5: thinking is **always on**, regardless of the `thinking` parameter.
+- Fable 5.1, Mythos 5.1, Fable 5, and Mythos 5: thinking is **always on**, regardless of the `thinking` parameter.
 
 **Adaptive thinking.** Claude 4.6+ and Mythos Preview use adaptive thinking: the model decides when and how much to think, calibrated by the `effort` parameter and query complexity. In internal evaluations it reliably beats extended thinking. Use it for agentic workloads: multistep tool use, complex coding, long-horizon loops.
 
@@ -130,5 +143,6 @@ Moving prompts from earlier generations to current models:
 4. Update thinking configuration to adaptive thinking + `effort` (no `budget_tokens`).
 5. Migrate away from prefilled responses (see Output and formatting above).
 6. Tune anti-laziness prompting down: 4.6+ models are proactive and overtrigger on guidance written for older, lazier models.
+7. Pass thinking blocks back unchanged and keep history append-only: append each assistant turn exactly as the API returned it, thinking blocks included. On Claude Fable 5.1, modifying the conversation before a thinking block results in an error, or in the block being dropped if you opt into that. Editing earlier messages, rebuilding `system` or `tools`, or summarizing older turns in place between requests invalidates every later thinking block, so move those changes to mid-conversation system messages and server-side context management.
 
 The migration guide at /docs/en/about-claude/models/migration-guide covers per-model steps, including Sonnet 4.5 → Sonnet 5 (effort default change, removal of manual extended thinking).

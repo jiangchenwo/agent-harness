@@ -1,8 +1,8 @@
 # Prompting Claude Opus 4.8 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8
-- Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source.
-- Covers: Claude Opus 4.8 only. General techniques live in `claude-best-practices.md`; this file is the deltas.
+- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
+- Covers: the prompting patterns specific to Claude Opus 4.8. The page defers the API changes of moving to Opus 5 to the migration guide, and techniques that apply across all current Claude models to the best-practices page.
 
 Claude Opus 4.8 has particular strengths in long-horizon agentic work, knowledge work, vision, and memory tasks. It performs well out of the box on existing Claude Opus 4.7 prompts.
 
@@ -44,7 +44,7 @@ Tends toward a direct, opinionated style with minimal validation-forward phrasin
 
 ## Controlling subagent spawning
 
-**Opus 4.8 tends to spawn fewer subagents by default** (the opposite direction from Opus 5 and Fable 5, so don't carry a damping cap over). Steer with explicit guidance on when subagents are desirable:
+**Opus 4.8 tends to spawn fewer subagents by default.** The behavior is steerable; give explicit guidance on when subagents are desirable:
 
 > Do not spawn a subagent for work you can complete directly in a single response (e.g. refactoring a function you can already see). Spawn multiple subagents in the same turn when fanning out across items or reading multiple files.
 
@@ -71,4 +71,4 @@ For single-pass self-filtering, set a concrete bar: "report any bugs that could 
 
 ## Computer use
 
-Works across resolutions up to 2576px / 3.75MP. 1080p balances performance and cost; 720p or 1366×768 for cost-sensitive workloads. Test your own settings; effort tuning helps.
+Opus 4.8 supports the `computer_toolset_20260801` toolset (Claude API and Google Cloud) and the earlier `computer_20251124` tool version. On the Claude API and Google Cloud it also supports the browser use tool (`browser_toolset_20260801`) for tasks inside webpages. Works across resolutions up to 2576px / 3.75MP. 1080p balances performance and cost; 720p or 1366×768 for cost-sensitive workloads. Test your own settings; effort tuning helps.

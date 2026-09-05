@@ -3,6 +3,29 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] - 2026-09-05
+
+### Added
+
+- `prompt-guides`: reference for Claude Fable 5.1 and Mythos 5.1, condensed
+  from the official prompting page.
+- `prompt-guides`: reference for GPT-6 Astra, condensed from OpenAI's
+  "Using GPT-6 Astra" page.
+
+### Changed
+
+- `prompt-guides`: each per-model reference now distills its own official
+  page and nothing else. Headers state the page's scope in the page's words,
+  and the router reads the per-model file before the vendor's generic guide.
+  Cross-model comparisons live only in `SKILL.md`, each naming its source
+  file.
+- `prompt-guides`: all references re-fetched on 2026-09-05. Best practices
+  gained the model-specific guidance table and Fable 5.1 notes, Opus 5 the
+  harness-level subagent caps, Opus 4.8 and Sonnet 5 the computer-use and
+  browser toolset identifiers, and the OpenAI generic guide now reports
+  gpt-6-astra as the vendor's stated default. The skill's own default
+  OpenAI target stays GPT-5.6, recorded in the router.
+
 ## [0.2.0] - 2026-08-20
 
 ### Added
