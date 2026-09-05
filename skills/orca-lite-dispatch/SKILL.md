@@ -18,15 +18,17 @@ message bus: it reads worker terminals, decides, and forwards. There is no task 
 no receipts, and no inbox. If the coordinator session dies, the workers keep running,
 and any later session can resume coordination by re-listing terminals.
 
-Read `orca skills get orca-cli` first for the exact, version-matched command surface.
-The recipes below add only what that guide does not: the luna-max launch argv and the
-relay protocol.
+Resolve the `ORCA` executable the way the `orca-cli` skill describes, then read
+`ORCA skills get orca-cli` for the exact, version-matched command surface. The recipes
+below add only what that guide does not: the luna-max launch argv and the relay
+protocol.
 
 ## Launch a luna-max codex worker
 
-`worktree create --agent codex` cannot pass model or effort flags, and
-`orca orchestration worker-start --effort` rejects `max`. Launch through a plain
-terminal instead.
+`worktree create --agent codex` cannot pass model or effort flags.
+`orca orchestration worker-start --model --effort` can, but it needs a Task bound to
+a Run, which is the machinery this skill leaves out. Launch through a plain terminal
+instead.
 
 Default to the current worktree: no new checkout, no new branch, and the
 worker's diff lands where the coordinator already sits.
@@ -74,8 +76,9 @@ Only when the run needs its own checkout (same tests as above):
 ORCA worktree create --name <task-name> --agent claude --prompt "<brief>" --json
 ```
 
-Use `startupTerminal.handle` from the create response as the one and only
-handle; do not also `terminal create` an agent in that worktree.
+Use `result.agentTerminalHandle` from the create response as the one and only
+handle (older runtimes return only `startupTerminal.handle`); do not also
+`terminal create` an agent in that worktree.
 
 ## Brief contract
 
@@ -108,6 +111,12 @@ Alternate between workers; never block indefinitely on one while the other is id
   wrong tree.
 - On `terminal_handle_stale`, reacquire the handle with `terminal list` and continue
   with the replacement only; never send to both the old and new handle.
+- A bare `worktree create` (no `--agent`) may open a fallback shell before the later
+  `terminal create` adds the codex worker. Send only to the agent handle; close the
+  shell only after `terminal list` confirms it is unused.
+- `terminal create` opens a visible tab without switching focus when it can, and
+  falls back to a background handle otherwise. Pass `--focus` when the user wants
+  the worker in front.
 - `terminal read` before `terminal send` unless the next input is obvious; a prompt
   sent while the TUI is mid-render can be lost.
 - Quote the codex `--command` argv exactly as shown; effort must travel inside
