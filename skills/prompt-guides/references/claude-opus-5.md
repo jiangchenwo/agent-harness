@@ -1,7 +1,7 @@
 # Prompting Claude Opus 5 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5
-- Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source.
+- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
 - Covers: the prompting patterns specific to Claude Opus 5. The page defers capabilities and API changes to the What's New page, and techniques that apply across all current Claude models to the best-practices page.
 
 Claude Opus 5 is built for complex agentic coding and enterprise work, with particular strengths in long-horizon agentic tasks. It performs well out of the box on existing Claude Opus 4.8 prompts. API changes from 4.8: thinking is on by default, and disabling thinking is capped at `high` effort.
@@ -51,6 +51,8 @@ The model can also expand task scope, adding unrequested steps. For narrow tasks
 Opus 5 delegates to subagents more readily than prior models. Delegation pays on genuinely independent, sizeable tracks; it multiplies cost on small tasks. Give explicit guidance or deterministic caps:
 
 > Delegate to a subagent only for large tasks that are genuinely independent and parallelizable, such as a wide multi-file investigation. Do not delegate work you can finish yourself in a handful of tool calls, and do not use subagents to verify or double-check your own work. If one subagent can complete the task, use one rather than several, and keep spawn counts low.
+
+If the harness is Claude Code or the Claude Agent SDK, the deterministic caps are the `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` and `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` environment variables and the SDK's `max_budget_usd` option. They require Claude Code 2.1.217 or later, so update a pinned SDK before pointing it at Opus 5. Claude Code adds a delegation instruction of its own on Opus 5 only under its `claude_code` system prompt preset; with a custom or omitted system prompt, add one yourself, such as the sample above.
 
 ## Self-correction
 

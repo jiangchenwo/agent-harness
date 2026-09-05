@@ -1,7 +1,7 @@
 # OpenAI prompt engineering (official guide, condensed)
 
 - Source: https://developers.openai.com/api/docs/guides/prompt-engineering
-- Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source; fetch it for SDK code samples and full prompt examples this condensation trims.
+- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source; fetch it for SDK code samples and full prompt examples this condensation trims.
 - Covers: all OpenAI API models (GPT and reasoning families). The page points to separate model-specific guidance for the latest model.
 
 ## Choosing a model
@@ -10,7 +10,7 @@
 - **GPT models** are fast, cost-efficient, and highly intelligent, but benefit from more explicit instructions about how to accomplish tasks.
 - **Large vs. mini/nano models** trade intelligence for speed and cost.
 
-When in doubt, `gpt-5.6` is the recommended general-purpose default. Because behavior varies by model type and even snapshot: pin production applications to specific model snapshots, and build tests and evaluation suites so you can monitor prompt behavior as you iterate or upgrade.
+When in doubt, the page names `gpt-6-astra` as a strong default for general-purpose text generation and prompt iteration. Because behavior varies by model type and even snapshot: pin production applications to specific model snapshots, and build tests and evaluation suites so you can monitor prompt behavior as you iterate or upgrade.
 
 ## Message roles and instruction following
 
@@ -41,9 +41,9 @@ Steer the model with a handful of input/output examples in the prompt instead of
 
 Add context to give the model proprietary data or constrain it to specific resources, via vector-database retrieval pasted into the prompt or the built-in file search tool. Plan for the context window (low-100k range up to 1M tokens depending on model).
 
-## Prompting current GPT-5 series models
+## Prompting current models
 
-GPT models like `gpt-5.6` benefit from precise instructions that explicitly provide the logic and data required for the task. The page links to the GPT-5.6 prompting guide for the full treatment; practical reminders:
+GPT models like `gpt-6-astra` benefit from precise instructions that explicitly provide the logic and data required for the task. The page links to the latest-model guide ("Using GPT-6 Astra") for the full current treatment; the practical reminders below still apply:
 
 **Coding.** Define the agent's role and workflow; enforce structured tool use with concrete invocation examples; require testing (unit tests, Python commands) and careful patch validation, since tools like `apply_patch` may return "Done" even on failure; set Markdown standards (inline code, fences, lists, tables; backticks for file paths, functions, classes).
 

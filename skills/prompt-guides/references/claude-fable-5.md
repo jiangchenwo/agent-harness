@@ -1,7 +1,7 @@
 # Prompting Claude Fable 5 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5
-- Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source.
+- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
 - Covers: the prompting and scaffolding patterns specific to Claude Fable 5 and Claude Mythos 5, framed as behavioral differences from Claude Opus 4.8. The page defers capabilities, API changes, pricing, and availability to the launch page, and techniques that apply across all current Claude models to the best-practices page.
 
 Claude Fable 5 takes on problems previously too complex, long-running, or ambiguous for prior models; it is particularly effective at end-to-end work that takes a person hours, days, or weeks. Teams see the best outcomes applying it to their hardest unsolved problems; testing only on simpler workloads undersells it. API notes: adaptive thinking only, summarized-only thinking output, no extended thinking budgets, and a `refusal` stop reason with fallback handling. Safety classifiers target offensive cybersecurity, biology/life sciences content, and extraction of summarized thinking; benign work in those areas can also trigger them, so configure server-side or client-side fallback to Claude Opus 4.8 to re-route declined requests.

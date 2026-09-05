@@ -1,7 +1,7 @@
 # Prompting Claude Opus 4.8 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8
-- Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source.
+- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
 - Covers: the prompting patterns specific to Claude Opus 4.8. The page defers the API changes of moving to Opus 5 to the migration guide, and techniques that apply across all current Claude models to the best-practices page.
 
 Claude Opus 4.8 has particular strengths in long-horizon agentic work, knowledge work, vision, and memory tasks. It performs well out of the box on existing Claude Opus 4.7 prompts.
@@ -71,4 +71,4 @@ For single-pass self-filtering, set a concrete bar: "report any bugs that could 
 
 ## Computer use
 
-Works across resolutions up to 2576px / 3.75MP. 1080p balances performance and cost; 720p or 1366×768 for cost-sensitive workloads. Test your own settings; effort tuning helps.
+Opus 4.8 supports the `computer_toolset_20260801` toolset (Claude API and Google Cloud) and the earlier `computer_20251124` tool version. On the Claude API and Google Cloud it also supports the browser use tool (`browser_toolset_20260801`) for tasks inside webpages. Works across resolutions up to 2576px / 3.75MP. 1080p balances performance and cost; 720p or 1366×768 for cost-sensitive workloads. Test your own settings; effort tuning helps.
