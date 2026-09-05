@@ -2,7 +2,7 @@
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices
 - Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source; fetch it when you need full SDK code samples or exact XML example blocks, which this condensation omits.
-- Covers: all current Claude models (Claude Fable 5, Mythos 5, Opus 5, Opus 4.8/4.7/4.6, Sonnet 5, Sonnet 4.6, Haiku 4.5). Model-specific deltas live in the sibling `claude-*.md` files.
+- Covers: techniques that apply across all current Claude models (Claude Fable 5, Mythos 5, Opus 5, Opus 4.8/4.7/4.6, Sonnet 5, Sonnet 4.6, Haiku 4.5). The page points to separate per-model guides for model-specific behavior.
 
 ## Contents
 
@@ -36,7 +36,7 @@
 
 ## Output and formatting
 
-**Communication style.** Current models are more direct and grounded, more conversational, and less verbose than previous generations; they may skip summaries after tool calls. For more visibility: "After completing a task that involves tool use, provide a quick summary of the work you've done." Exception: Claude Opus 5's user-facing responses run longer by default, and effort does not reliably change visible response length. Prompt explicitly for conciseness (see `claude-opus-5.md`).
+**Communication style.** Current models are more direct and grounded, more conversational, and less verbose than previous generations; they may skip summaries after tool calls. For more visibility: "After completing a task that involves tool use, provide a quick summary of the work you've done." Exception: Claude Opus 5's user-facing responses run longer by default, and effort does not reliably change visible response length. Prompt explicitly for conciseness; the page links to the Opus 5 prompting guide for the details.
 
 **Control response format.** Four techniques, in order of usefulness:
 

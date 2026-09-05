@@ -2,7 +2,7 @@
 
 - Source: https://developers.openai.com/api/docs/guides/prompt-engineering
 - Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source; fetch it for SDK code samples and full prompt examples this condensation trims.
-- Covers: all OpenAI API models (GPT and reasoning families). GPT-5.6-specific guidance lives in `openai-gpt-5p6.md`.
+- Covers: all OpenAI API models (GPT and reasoning families). The page points to separate model-specific guidance for the latest model.
 
 ## Choosing a model
 
@@ -43,7 +43,7 @@ Add context to give the model proprietary data or constrain it to specific resou
 
 ## Prompting current GPT-5 series models
 
-GPT models like `gpt-5.6` benefit from precise instructions that explicitly provide the logic and data required for the task. Full treatment in the GPT-5.6 guide (`openai-gpt-5p6.md`); practical reminders:
+GPT models like `gpt-5.6` benefit from precise instructions that explicitly provide the logic and data required for the task. The page links to the GPT-5.6 prompting guide for the full treatment; practical reminders:
 
 **Coding.** Define the agent's role and workflow; enforce structured tool use with concrete invocation examples; require testing (unit tests, Python commands) and careful patch validation, since tools like `apply_patch` may return "Done" even on failure; set Markdown standards (inline code, fences, lists, tables; backticks for file paths, functions, classes).
 

@@ -2,7 +2,7 @@
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5
 - Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source.
-- Covers: Claude Opus 5 only. General techniques live in `claude-best-practices.md`; this file is the deltas.
+- Covers: the prompting patterns specific to Claude Opus 5. The page defers capabilities and API changes to the What's New page, and techniques that apply across all current Claude models to the best-practices page.
 
 Claude Opus 5 is built for complex agentic coding and enterprise work, with particular strengths in long-horizon agentic tasks. It performs well out of the box on existing Claude Opus 4.8 prompts. API changes from 4.8: thinking is on by default, and disabling thinking is capped at `high` effort.
 

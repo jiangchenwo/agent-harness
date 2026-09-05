@@ -2,7 +2,7 @@
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5
 - Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source.
-- Covers: Claude Sonnet 5 only. General techniques live in `claude-best-practices.md`; this file is the deltas.
+- Covers: the prompting patterns specific to Claude Sonnet 5. The page defers capabilities and API changes to the What's New page, and techniques that apply across all current Claude models to the best-practices page.
 
 Claude Sonnet 5 has particular strengths in coding and agentic tasks and performs well out of the box on existing Claude Sonnet 4.6 prompts. API changes from 4.6: adaptive thinking on by default, sampling parameters not accepted, manual extended thinking removed, and a new tokenizer.
 

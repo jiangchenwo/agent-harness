@@ -2,7 +2,7 @@
 
 - Source: https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6
 - Fetched: 2026-08-12. Append `.md` to the URL for the raw Markdown source.
-- Covers: GPT-5.6 Sol and the GPT-5.6 family. General OpenAI techniques live in `openai-prompt-engineering.md`; this file is the deltas.
+- Covers: adapting prompts, tool descriptions, agent instructions, or prompt stacks to GPT-5.6 Sol or the GPT-5.6 family. The page defers API details, limits, pricing, and feature availability to the GPT-5.6 model guide.
 
 GPT-5.6 works best when prompts define the outcome, important constraints, available evidence, and completion bar, then leave room for the model to choose an efficient path. In OpenAI's internal coding-agent eval sample, leaner system prompts improved scores by roughly 10 to 15 percent while cutting total tokens by 41 to 66 percent and cost by 33 to 67 percent. Those numbers are directional; validate on your own tasks.
 
