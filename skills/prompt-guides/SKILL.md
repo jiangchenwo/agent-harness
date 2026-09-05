@@ -1,6 +1,7 @@
 ---
 name: prompt-guides
-description: Condensed official prompt-engineering guides from Anthropic and OpenAI, generic and model-specific, for writing prompts that another model or agent will execute: subagent briefs, system prompts, delegated task specs, prompt migrations. Consult this whenever writing or reviewing a prompt for another agent, tuning a prompt for a specific target model (Claude Fable 5.1, Fable 5, Opus 5, Sonnet 5, Opus 4.8, GPT-6 Astra, GPT-5.6), or moving a prompt between models, even if the request never says "prompt engineering." Advisory: it supplements the host system's own rules, and where they conflict, the host wins.
+description: >-
+  Condensed official prompt-engineering guides from Anthropic and OpenAI, generic and model-specific, for writing prompts that another model or agent will execute: subagent briefs, system prompts, delegated task specs, prompt migrations. Consult this whenever writing or reviewing a prompt for another agent, tuning a prompt for a specific target model (Claude Fable 5.1, Fable 5, Opus 5, Sonnet 5, Opus 4.8, GPT-6 Astra, GPT-5.6), or moving a prompt between models, even if the request never says "prompt engineering." Advisory: it supplements the host system's own rules, and where they conflict, the host wins.
 ---
 
 # Prompt guides
