@@ -16,7 +16,7 @@ Profiles live in `~/.claude/agents/`.
 | Complexity                                                                  | Dispatch                            |
 | --------------------------------------------------------------------------- | ----------------------------------- |
 | Mechanical: sweeps, listings, format checks, eval runs                      | `sweep` (sonnet, low)                |
-| Mechanical implementation with a test oracle, on explicit request           | `gemini-worker` skill (agy, gemini-3.8-flash-low) |
+| Mechanical implementation with a test oracle, on explicit request           | `gemini-worker` skill (agy, gemini-3.8-flash-medium) |
 | Scoped implementation on GPT, on explicit request                           | `gpt-worker` skill (codex, gpt-5.6-luna max) |
 | Standard: doc and web research, comparisons                                 | `doc-researcher` (sonnet, medium)   |
 | Judgment: verification of completed work                                    | `code-verifier` (opus, high)        |
@@ -93,7 +93,7 @@ model; the per-model skews above still govern eagerness.
 
 | Worker | CLI, model | Headless | Visible in Orca | Trigger words |
 | ------ | ---------- | -------- | --------------- | ------------- |
-| Gemini | `agy`, `gemini-3.8-flash-low`; medium only after a verifier fail | `gemini-worker` | `orca-lite-dispatch`, gemini section | "dispatch gemini", "gemini worker" |
+| Gemini | `agy`, `gemini-3.8-flash-medium`; high only after a verifier fail | `gemini-worker` | `orca-lite-dispatch`, gemini section | "dispatch gemini", "gemini worker" |
 | GPT    | `codex`, `gpt-5.6-luna` at max | `gpt-worker` | `orca-lite-dispatch`, luna section | "dispatch gpt", "codex worker", "dispatch luna", "use luna" |
 
 - Availability: `command -v agy` or `command -v codex` at dispatch. Absent:
