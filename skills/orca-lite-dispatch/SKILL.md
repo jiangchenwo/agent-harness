@@ -6,8 +6,7 @@ description: >-
   coordinating Claude session, and relay messages between them by reading and
   writing their terminals. Use when the user says "lite dispatch", "dispatch
   luna", "luna max worker", "spawn luna and claude workers", "watch a gemini
-  worker", "watch a codex worker", "gpt worker in a terminal", or wants
-  multi-agent work running in terminals they can watch, without
+  worker", or wants multi-agent work running in terminals they can watch, without
   the orca-orchestrator task/receipt machinery. Use the
   `orchestration` skill instead for task DAGs, worker_done waits, decision
   gates, or durable task state; use `orca-cli` for full ownership handoffs.
@@ -27,9 +26,7 @@ protocol.
 
 ## Launch a luna-max codex worker
 
-The visible surface of the `gpt-worker` skill, which owns the headless
-`codex exec` path and the brief contract; this section is only the terminal
-argv. `worktree create --agent codex` cannot pass model or effort flags.
+`worktree create --agent codex` cannot pass model or effort flags.
 `orca orchestration worker-start --model --effort` can, but it needs a Task bound to
 a Run, which is the machinery this skill leaves out. Launch through a plain terminal
 instead.
@@ -92,7 +89,7 @@ owns the brief contract; this is only the terminal argv.
 
 ```text
 ORCA terminal create --worktree active --title <task-name> \
-  --command 'cd <abs workdir> && agy --dangerously-skip-permissions --model gemini-3.8-flash-low' --json
+  --command 'cd <abs workdir> && agy --dangerously-skip-permissions --model gemini-3.8-flash-medium' --json
 ORCA terminal send --terminal <handle> --enter --json      # accepts the trust prompt
 ORCA terminal send --terminal <handle> --text "<brief>" --enter --json
 ```
