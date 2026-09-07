@@ -74,6 +74,11 @@ the fix then goes to each agent by SendMessage, not by a fresh round.
 
 - **fable 5**: delegates dependably — use subagents freely. For long runs,
 spawn fresh-context verifiers over self-critique.
+- **fable 5.1**: same delegation posture as fable 5, with two additions from
+its guide. Run subagents in the background and keep working while they run;
+that lowers time to completion at the same quality and cost. And say in one
+line what was dispatched and where: 5.1 writes fewer progress notes than
+fable 5, so a silent background dispatch is invisible to the user.
 - **opus 5**: delegates too readily — cap it. Only large, genuinely independent
 tracks; never work finishable in a few tool calls, never to verify its own
 output (it self-verifies).
