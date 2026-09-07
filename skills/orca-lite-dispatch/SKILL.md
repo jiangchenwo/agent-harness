@@ -2,11 +2,12 @@
 name: orca-lite-dispatch
 description: >-
   Dispatch visible Orca terminal workers (codex on gpt-5.6-luna at max effort,
-  claude, or any custom agent argv) from a coordinating Claude session, and
-  relay messages between them by reading and writing their terminals. Use when
-  the user says "lite dispatch", "dispatch luna", "luna max worker", "spawn luna
-  and claude workers", or wants multi-agent work running in terminals they can
-  watch, without the orca-orchestrator task/receipt machinery. Use the
+  claude, a Gemini 3.8 Flash worker through agy, or any custom agent argv) from a
+  coordinating Claude session, and relay messages between them by reading and
+  writing their terminals. Use when the user says "lite dispatch", "dispatch
+  luna", "luna max worker", "spawn luna and claude workers", "watch a gemini
+  worker", or wants multi-agent work running in terminals they can watch, without
+  the orca-orchestrator task/receipt machinery. Use the
   `orchestration` skill instead for task DAGs, worker_done waits, decision
   gates, or durable task state; use `orca-cli` for full ownership handoffs.
 ---
@@ -80,6 +81,30 @@ Use `result.agentTerminalHandle` from the create response as the one and only
 handle (older runtimes return only `startupTerminal.handle`); do not also
 `terminal create` an agent in that worktree.
 
+## Launch a gemini worker
+
+A visible Gemini worker (Gemini 3.8 Flash through `agy`) when the user wants to
+watch or steer it. The `gemini-worker` skill covers the headless Bash path and
+owns the brief contract; this is only the terminal argv.
+
+```text
+ORCA terminal create --worktree active --title <task-name> \
+  --command 'cd <abs workdir> && agy --dangerously-skip-permissions --model gemini-3.8-flash-low' --json
+ORCA terminal send --terminal <handle> --enter --json      # accepts the trust prompt
+ORCA terminal send --terminal <handle> --text "<brief>" --enter --json
+```
+
+No `--add-dir` here: interactive mode makes the cwd the workspace once trusted.
+That trust prompt ("Do you trust the contents of this project?") blocks the
+first real prompt, so send a bare Enter before the brief. Effort lives in the
+model id, not a flag. Write the brief to the `gemini-worker` contract (absolute
+workdir, test command, files in scope, reply cap) because CLAUDE.md is invisible
+to Gemini.
+
+`terminal wait --for tui-idle` never reports idle for agy (it stays on
+`codex-trust-workspace`), so poll `terminal read` until the screen stops
+changing instead of waiting on idle.
+
 ## Brief contract
 
 End every worker brief with these two rules so terminal reads stay cheap to interpret:
@@ -121,3 +146,6 @@ Alternate between workers; never block indefinitely on one while the other is id
   sent while the TUI is mid-render can be lost.
 - Quote the codex `--command` argv exactly as shown; effort must travel inside
   `-c model_reasoning_effort=...`, not a CLI effort flag.
+- `terminal wait --for tui-idle` never satisfies for an agy worker; it holds on
+  `codex-trust-workspace` even after the trust prompt is gone. Poll `terminal
+  read` until the screen stabilises instead.
