@@ -39,7 +39,7 @@ The Agent tool's model list is Claude-only, so non-Claude workers dispatch throu
 
 | Worker | CLI, model | Headless | Visible in Orca | Fires on |
 |---|---|---|---|---|
-| Gemini | `agy`, gemini-3.8-flash-low | [gemini-worker](skills/gemini-worker/SKILL.md) | [orca-lite-dispatch](skills/orca-lite-dispatch/SKILL.md), gemini section | "dispatch gemini", "gemini worker" |
+| Gemini | `agy`, gemini-3.8-flash-medium | [gemini-worker](skills/gemini-worker/SKILL.md) | [orca-lite-dispatch](skills/orca-lite-dispatch/SKILL.md), gemini section | "dispatch gemini", "gemini worker" |
 | GPT | `codex`, gpt-5.6-luna at max | [gpt-worker](skills/gpt-worker/SKILL.md) | [orca-lite-dispatch](skills/orca-lite-dispatch/SKILL.md), luna section | "dispatch gpt", "codex worker", "dispatch luna" |
 
 ## Delegation rule
