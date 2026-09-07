@@ -4,7 +4,7 @@ description: >-
   Dispatch a headless Google Gemini worker (Gemini 3.8 Flash through the `agy` /
   Antigravity CLI) from plain Bash to do mechanical, verifiable implementation:
   add tests to a module, fix a reproduced bug, apply a spec'd multi-file edit.
-  Runs at roughly a tenth of the Opus cost with no Orca dependency. Use this
+  Runs at a fraction of the Opus cost with no Orca dependency. Use this
   whenever the user explicitly asks to delegate coding to Gemini, agy, or Flash,
   or says "dispatch gemini", "run this on gemini", "gemini worker", "use a cheap
   worker", or "delegate to gemini". Covers the launch recipe, the brief
@@ -36,17 +36,16 @@ say Gemini was unavailable.
 Run in the background through Bash. One command, no wrapper script:
 
 ```
-cd <workdir> && agy -p "<brief>" --model gemini-3.8-flash-low \
+cd <workdir> && agy -p "<brief>" --model gemini-3.8-flash-medium \
   --add-dir "$PWD" --output-format json --dangerously-skip-permissions \
   --print-timeout 10m > <scratchpad>/gemini-<task>.json
 ```
 
 Why each flag:
 
-- `--model gemini-3.8-flash-low`: the default tier, correct on mechanical tasks
-  at a tenth of the Opus cost. Effort is baked into the model id; there is no
-  effort flag. Escalate to `gemini-3.8-flash-medium` only after a `code-verifier`
-  fail on the low run. `agy models` is the source of truth for ids; trust it
+- `--model gemini-3.8-flash-medium`: the default tier. Effort is baked into the
+  model id; there is no effort flag. Escalate to `gemini-3.8-flash-high` only
+  after a `code-verifier` fail on the medium run. `agy models` is the source of truth for ids; trust it
   over any hardcoded name here if they disagree.
 - `--add-dir "$PWD"`: required in headless mode. Without it there is no active
   workspace: the model is not told its cwd and burns turns on `find`, `lsof`,
@@ -102,12 +101,12 @@ events instead; tool calls are `step_update` with `step_type: "tool"` and
 The worker's diff goes to a fresh-context `code-verifier` (opus, high) every
 time; never let a Gemini run verify its own output. On a pass, the session
 commits or merges per the git rules; on a fail, report the findings and hold, or
-re-run once at `gemini-3.8-flash-medium`. This skill dispatches and reads; it
+re-run once at `gemini-3.8-flash-high`. This skill dispatches and reads; it
 never commits.
 
 ## Pitfalls
 
-- Effort is part of the model id, not a flag: `gemini-3.8-flash-low`, not a
+- Effort is part of the model id, not a flag: `gemini-3.8-flash-medium`, not a
   separate `--effort`.
 - `agy update` can change flags; re-check `agy --help` after an update, and
   trust `agy models` over any id written here.
