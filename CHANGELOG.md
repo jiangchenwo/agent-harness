@@ -16,13 +16,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- `gemini-worker`: default tier raised from `gemini-3.8-flash-low` to
+  `gemini-3.8-flash-medium`; escalation after a verifier fail is now
+  `gemini-3.8-flash-high`. The visible argv in `orca-lite-dispatch` and the
+  delegation rule follow.
 - `subagent-delegation`: the Gemini and Orca sections merged into one
   cross-vendor workers section with a vendor table, and a new surface rule
   that picks headless or a visible Orca terminal per run: headless outside
   Orca; inside Orca, a terminal for implementation the user may want to watch,
   long or multi-file runs, and anything that may need steering, headless for
   short mechanical runs with a test oracle and for parallel fan-out, with word
-  overrides and a tie to visible.
+  overrides and a tie to visible. The per-model section gains a Fable 5.1
+  entry: background subagents while the session keeps working, and a one-line
+  note of what was dispatched.
 - `orca-lite-dispatch`: the luna section now points at `gpt-worker` for the
   headless path and the brief contract; description names the codex worker.
 - README: agent profiles split into Claude profiles under `agents/` and a table
