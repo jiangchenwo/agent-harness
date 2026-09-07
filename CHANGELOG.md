@@ -3,6 +3,32 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.0] - 2026-09-07
+
+### Added
+
+- `gpt-worker` skill: dispatch a headless GPT worker (gpt-5.6-luna at max
+  effort through `codex exec`) from plain Bash, no Orca dependency. Covers the
+  launch recipe and why each flag exists, the sandboxed alternative, the brief
+  contract (codex reads AGENTS.md, CLAUDE.md stays invisible), the JSONL event
+  stream and result file, and the mandatory `code-verifier` hand-off. Fires on
+  explicit request only.
+
+### Changed
+
+- `subagent-delegation`: the Gemini and Orca sections merged into one
+  cross-vendor workers section with a vendor table, and a new surface rule
+  that picks headless or a visible Orca terminal per run: headless outside
+  Orca; inside Orca, a terminal for implementation the user may want to watch,
+  long or multi-file runs, and anything that may need steering, headless for
+  short mechanical runs with a test oracle and for parallel fan-out, with word
+  overrides and a tie to visible.
+- `orca-lite-dispatch`: the luna section now points at `gpt-worker` for the
+  headless path and the brief contract; description names the codex worker.
+- README: agent profiles split into Claude profiles under `agents/` and a table
+  of other-vendor workers with their headless and visible paths; new section
+  summarising what the delegation rule decides.
+
 ## [0.5.0] - 2026-09-07
 
 ### Added

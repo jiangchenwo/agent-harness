@@ -17,13 +17,14 @@ Profiles live in `~/.claude/agents/`.
 | --------------------------------------------------------------------------- | ----------------------------------- |
 | Mechanical: sweeps, listings, format checks, eval runs                      | `sweep` (sonnet, low)                |
 | Mechanical implementation with a test oracle, on explicit request           | `gemini-worker` skill (agy, gemini-3.8-flash-low) |
+| Scoped implementation on GPT, on explicit request                           | `gpt-worker` skill (codex, gpt-5.6-luna max) |
 | Standard: doc and web research, comparisons                                 | `doc-researcher` (sonnet, medium)   |
 | Judgment: verification of completed work                                    | `code-verifier` (opus, high)        |
 | Judgment: implementation planning                                           | `plan-architect` (fable, high)      |
 | Judgment: scoped implementation                                             | `clean-coder` (opus, medium)        |
 | Writing: docs (including code-grounded docs with citations), artifact prose | `prose-writer` (sonnet 4.6, medium) |
 | Browser capture, scraping, PDF fetching                                     | `page-capture` (sonnet, medium)     |
-| Scoped implementation, on explicit request in Orca                          | `luna-max` via orca-lite-dispatch   |
+| Either worker in a terminal the user can watch, in Orca                     | `orca-lite-dispatch` skill          |
 
 
 When a named profile fits, dispatch to it instead of general-purpose or
@@ -84,43 +85,53 @@ turn. Send model-load, generate, and eval commands with verbose stdout to one
 in-session.
 - Any other session model: read its entry in the `prompt-guides` skill.
 
-## Gemini layer
+## Cross-vendor workers
 
-A non-Claude worker for mechanical implementation with a test oracle, on the
-user's explicit request only ("dispatch gemini", "gemini worker"). No standing
-tier; never propose it unprompted. Applies from every session model. Mechanics
-live in the `gemini-worker` skill.
+Non-Claude workers for implementation, on the user's explicit request only.
+No standing tier; never propose one unprompted. Applies from every session
+model; the per-model skews above still govern eagerness.
 
-- Availability: `command -v agy` at dispatch. Absent: fall to `clean-coder` and
-  say Gemini was unavailable.
-- Model: `gemini-3.8-flash-low`; escalate to `gemini-3.8-flash-medium` only after
-  a `code-verifier` fail. Trust `agy models` for current ids.
-- Verification: every Gemini diff passes a fresh-context `code-verifier` (opus,
-  high) before it lands; a Gemini run never verifies its own output. Pass: commit
-  or merge per the git rules. Fail: report and hold.
-- Rules gap: CLAUDE.md is invisible to Gemini; rules that must reach the worker
-  go in the brief or an AGENTS.md the repo carries.
+| Worker | CLI, model | Headless | Visible in Orca | Trigger words |
+| ------ | ---------- | -------- | --------------- | ------------- |
+| Gemini | `agy`, `gemini-3.8-flash-low`; medium only after a verifier fail | `gemini-worker` | `orca-lite-dispatch`, gemini section | "dispatch gemini", "gemini worker" |
+| GPT    | `codex`, `gpt-5.6-luna` at max | `gpt-worker` | `orca-lite-dispatch`, luna section | "dispatch gpt", "codex worker", "dispatch luna", "use luna" |
 
-## Orca layer
+- Availability: `command -v agy` or `command -v codex` at dispatch. Absent:
+  fall to `clean-coder` and say the worker was unavailable.
+- The Agent tool's model enum is Claude-only, so the skill is the dispatch
+  surface for both.
+- Verification: every worker diff passes a fresh-context `code-verifier`
+  (opus, high) before it lands; a worker never verifies its own output. Pass:
+  commit or merge per the git rules. Fail: report and hold.
+- Rules gap: CLAUDE.md is invisible to both workers. Rules that must reach the
+  worker go in the brief or an AGENTS.md the repo carries (codex reads
+  AGENTS.md; Gemini reads AGENTS.md and GEMINI.md).
 
-Active only when the session runs Orca-managed (`ORCA_WORKTREE_ID` is set); inert
-everywhere else. Applies from every session model; the per-model skews above still
-govern eagerness.
+### Surface
 
-- `luna-max` (gpt-5.6-luna at max effort) substitutes for `clean-coder` on the
-user's explicit trigger only — "dispatch luna", "use luna", "lite dispatch". No
-standing volume tier, and never propose it unprompted.
-- Mechanics defer to the `orca-lite-dispatch` skill: luna runs in the current
-worktree by default, on the current branch; a child worktree and branch only
-when the run needs isolation. The brief follows the `prompt-guides` luna entry
-with the sentinel contract, relayed under supervision.
-- Every luna diff passes `code-verifier` (opus, high) before it lands. In place:
-verify the working-tree diff, then commit. On a branch: merge `--no-ff` per the
-git rules on pass and delete the branch without asking; on fail, report the
-findings and hold the branch.
-- Merge messages follow the standard merge format and name no assistant or model,
-or the commit-msg guard stalls the automatic merge.
-- luna has no `agents/` profile: the Agent tool's model enum is Claude-only, so the
-skill is its dispatch surface. A luna request outside Orca falls to `clean-coder`,
-noting luna was unavailable.
+Headless (Bash, result file only) or visible (an Orca terminal the user can
+watch and steer). Both share the brief contract and the verifier hand-off;
+only the launch argv differs.
 
+- `ORCA_WORKTREE_ID` unset: headless, always.
+- In Orca, visible when the run is implementation the user may want to watch
+  or review as it happens, is long or touches several files, may need steering
+  or a clarifying answer mid-run, or the user says "watch", "terminal",
+  "visible", "spawn".
+- In Orca, headless when the run is short and mechanical with a test oracle,
+  is one of several parallel workers, only its diff and summary matter, or the
+  user says "headless", "background", "quiet".
+- Tie: visible. A terminal can be ignored; a headless run cannot be watched
+  after the fact.
+- Say which surface was chosen and why in one line at dispatch.
+
+### In Orca
+
+- A visible worker runs in the current worktree on the current branch; a child
+  worktree and branch only when the run needs isolation. Mechanics live in the
+  `orca-lite-dispatch` skill, including its sentinel contract for reading the
+  terminal.
+- In place: verify the working-tree diff, then commit. On a branch: merge
+  `--no-ff` per the git rules on pass and delete the branch without asking; on
+  fail, report and hold. Merge messages name no assistant or model, or the
+  commit-msg guard stalls the automatic merge.
