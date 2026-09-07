@@ -3,6 +3,25 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] - 2026-09-06
+
+### Added
+
+- `gemini-worker` skill: dispatch a headless Gemini 3.8 Flash worker through the
+  `agy` CLI from plain Bash, no Orca dependency. Covers the launch recipe and
+  why each flag exists, the brief contract (absolute workdir, test oracle, reply
+  cap, directory boundary; CLAUDE.md is invisible to Gemini), reading the JSON
+  envelope, and the mandatory `code-verifier` hand-off. Fires on explicit
+  request only; defaults to `gemini-3.8-flash-low`, escalates to medium after a
+  verifier fail.
+
+### Changed
+
+- `orca-lite-dispatch`: added a "Launch a gemini worker" section for the
+  visible-terminal path: the interactive argv, the trust-prompt Enter, and the
+  `tui-idle` gap that forces screen polling, pointing at `gemini-worker` for the
+  brief. Description and pitfalls updated to name the Gemini worker.
+
 ## [0.3.1] - 2026-09-05
 
 ### Changed
