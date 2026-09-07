@@ -4,3 +4,6 @@ user-docs/
 CLAUDE.md
 # skill eval workspaces
 skills/*-workspace/
+
+# mac
+*.DS_Store
