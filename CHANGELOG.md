@@ -3,6 +3,22 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0] - 2026-09-07
+
+### Added
+
+- `agents/`: the seven subagent profiles (`sweep`, `doc-researcher`,
+  `page-capture`, `prose-writer`, `clean-coder`, `code-verifier`,
+  `plan-architect`) moved in from `~/.claude/agents`, so the profiles the
+  delegation rule names live next to the skills they use.
+- `rules/subagent-delegation.md`: the delegation rule itself, moved in from
+  `~/.claude/rules`. Both are symlinked back into `~/.claude`.
+
+### Changed
+
+- Repository renamed from `skills` to `agent-harness`; the README now describes
+  the whole harness and how to link it into `~/.claude`.
+
 ## [0.4.0] - 2026-09-06
 
 ### Added
