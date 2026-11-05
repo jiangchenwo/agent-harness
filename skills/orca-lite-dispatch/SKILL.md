@@ -99,8 +99,8 @@ ORCA terminal send --terminal <handle> --text "<brief>" --enter --json
 
 No `--add-dir` here: interactive mode makes the cwd the workspace once trusted.
 That trust prompt ("Do you trust the contents of this project?") blocks the
-first real prompt, so send a bare Enter before the brief. Effort lives in the
-model id, not a flag. Write the brief to the `gemini-worker` contract (absolute
+first real prompt, so send a bare Enter before the brief. Set effort through
+the model id, not `--effort` (`--model gemini-3.8-flash-medium --effort high` errors). Write the brief to the `gemini-worker` contract (absolute
 workdir, test command, files in scope, reply cap) because CLAUDE.md is invisible
 to Gemini.
 
