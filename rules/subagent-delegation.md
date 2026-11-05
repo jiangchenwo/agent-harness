@@ -22,7 +22,7 @@ Match the dispatch to the task's complexity. Named profiles pin `model` and
 | Judgment: verification of completed work                                    | `code-verifier` (opus, high)        |
 | Judgment: implementation planning                                           | `plan-architect` (fable, high)      |
 | Judgment: scoped implementation                                             | `clean-coder` (opus, medium)        |
-| Writing: docs (including code-grounded docs with citations), artifact prose | `prose-writer` (sonnet 4.6, medium) |
+| Writing: docs (including code-grounded docs with citations), artifact prose | `prose-writer` (sonnet, medium)     |
 | Browser capture, scraping, PDF fetching                                     | `page-capture` (sonnet, medium)     |
 | Either worker in a terminal the user can watch, in Orca                     | `orca-lite-dispatch` skill          |
 
