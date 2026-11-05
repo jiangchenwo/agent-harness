@@ -3,6 +3,19 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.1] - 2026-11-05
+
+### Changed
+
+- Agent profiles no longer list `codebase-memory-mcp` or `context7` tools,
+  since neither server is installed now. `code-verifier`, `plan-architect`,
+  `prose-writer`, and `sweep` lose the graph tools; `doc-researcher` and
+  `plan-architect` lose context7. Body text that pointed at those tools now
+  points at Grep, Glob, Read, and official docs, and `clean-coder` gets the
+  same rewrite.
+- `plan-architect`: `model: Fable` is now `model: fable`, since the docs only
+  list lowercase aliases.
+
 ## [0.6.0] - 2026-09-07
 
 ### Added
