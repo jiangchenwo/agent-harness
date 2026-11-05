@@ -3,6 +3,41 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.0] - 2026-11-05
+
+### Changed
+
+- `subagent-delegation`: the Agent call now takes an effort per dispatch.
+  Built-in types without a profile (general-purpose, Explore, Plan,
+  claude-code-guide, claude) get both `model` and `effort`, with effort taken
+  from the complexity table: mechanical `low`, standard `medium`, judgment
+  `high`, and `medium` when no row matches. Named profiles still pin both in
+  their frontmatter, so a dispatch to one passes neither unless the user asks
+  for a specific effort.
+- `subagent-delegation`: the paragraph saying `opus` is pinned to Opus 4.8
+  is replaced. Aliases now track the newest model of each tier, and the rule
+  lists the current mapping as of 2026-11: Opus 5.5, Sonnet 5.5, Haiku 5.5,
+  and Fable 5.1.
+- `subagent-delegation`: the per-model skews now cover Fable 5.1 and Sonnet
+  5.5, each taken from its own prompting guide only. Fable 5.1 runs
+  subagents in the background and says what it dispatched. Sonnet 5.5, at
+  `xhigh` and `max`, stops and reports when the work is done instead of
+  launching reviewer subagents. Opus 5.5 gets no entry because its guide has
+  no delegation guidance. Other session models fall back to the
+  `prompt-guides` skill.
+- `prose-writer`: runs on `sonnet` (Sonnet 5.5) instead of Sonnet 4.6.
+
+### Removed
+
+- `subagent-delegation`: the Fable 5, Opus 5, Sonnet 5, and Opus 4.8 skew
+  entries.
+
+### Fixed
+
+- `gemini-worker`, `orca-lite-dispatch`: agy does have an `--effort` flag,
+  but `--model gemini-3.8-flash-medium --effort high` fails with a conflict
+  error. Effort still goes in the model id.
+
 ## [0.7.0] - 2026-11-05
 
 ### Added

@@ -7,10 +7,10 @@ independent parallel tracks. Keep interdependent coding in-session.
 
 ## Choosing the dispatch
 
-Match the dispatch to the task's complexity. Effort cannot be set in the
-Agent call (the tool has a `model` parameter but no effort parameter), so
-"choose the effort" means "dispatch to the named profile that pins it".
-Profiles live in `~/.claude/agents/`.
+Match the dispatch to the task's complexity. Named profiles pin `model` and
+`effort` in their frontmatter, so a dispatch to one passes neither. Pass
+`effort` to a profile only when the user asks. Profiles live in
+`~/.claude/agents/`.
 
 
 | Complexity                                                                  | Dispatch                            |
@@ -22,20 +22,22 @@ Profiles live in `~/.claude/agents/`.
 | Judgment: verification of completed work                                    | `code-verifier` (opus, high)        |
 | Judgment: implementation planning                                           | `plan-architect` (fable, high)      |
 | Judgment: scoped implementation                                             | `clean-coder` (opus, medium)        |
-| Writing: docs (including code-grounded docs with citations), artifact prose | `prose-writer` (sonnet 4.6, medium) |
+| Writing: docs (including code-grounded docs with citations), artifact prose | `prose-writer` (sonnet, medium)     |
 | Browser capture, scraping, PDF fetching                                     | `page-capture` (sonnet, medium)     |
 | Either worker in a terminal the user can watch, in Orca                     | `orca-lite-dispatch` skill          |
 
 
 When a named profile fits, dispatch to it instead of general-purpose or
-Explore. When none fits, set `model` explicitly in the call; never inherit by
-omission — on a Fable session that silently runs the subagent on the most
-expensive tier. That applies to every built-in type without a profile:
-general-purpose, Explore, Plan, claude-code-guide, claude. Default to sonnet.
+Explore. When none fits, set both `model` and `effort` in the call; never
+inherit by omission — on a Fable session that silently runs the subagent on
+the most expensive tier. That applies to every built-in type without a
+profile: general-purpose, Explore, Plan, claude-code-guide, claude. Default to
+sonnet. Take effort from the table row the task matches: mechanical `low`,
+standard `medium`, judgment `high`; `medium` when no row matches.
 
-`opus` in the profiles resolves to Opus 4.8, pinned by
-`ANTHROPIC_DEFAULT_OPUS_MODEL` in `settings.json`, even when the session runs
-Opus 5. Same price; Opus 4.8 follows a brief literally and delegates less.
+Model aliases track the newest model of each tier, and nothing pins them. As
+of 2026-11: `opus` is Opus 5.5, `sonnet` is Sonnet 5.5, `haiku` is Haiku 5.5,
+`fable` is Fable 5.1.
 
 ## Briefing
 
@@ -72,22 +74,16 @@ the fix then goes to each agent by SendMessage, not by a fresh round.
 
 ## Per dispatching model
 
-- **fable 5**: delegates dependably — use subagents freely. For long runs,
-spawn fresh-context verifiers over self-critique.
-- **fable 5.1**: same delegation posture as fable 5, with two additions from
-its guide. Run subagents in the background and keep working while they run;
-that lowers time to completion at the same quality and cost. And say in one
-line what was dispatched and where: 5.1 writes fewer progress notes than
-fable 5, so a silent background dispatch is invisible to the user.
-- **opus 5**: delegates too readily — cap it. Only large, genuinely independent
-tracks; never work finishable in a few tool calls, never to verify its own
-output (it self-verifies).
-- **sonnet 5**: no strong skew to correct — follow the general guidance above
-and its `prompt-guides` entry.
-- **opus 4.8**: delegates too little. Fan out independent tracks in the same
-turn. Send model-load, generate, and eval commands with verbose stdout to one
-`sweep` agent and resume it per run; keep only the scoring decision
-in-session.
+- **fable 5.1**: run subagents in the background and keep working while they
+run; on coding tasks that lowers time to completion at similar quality,
+token usage, and cost. Say in one line what was dispatched and where: 5.1
+writes little text between tool calls, so a silent background dispatch is
+invisible to the user.
+- **sonnet 5.5**: at `xhigh` and `max` effort it may start its own review
+rounds after finishing, sometimes with subagents. At those levels, once the
+requested work is done and its checks pass, stop and report. Don't launch
+reviewer subagents unless the user asked for a review; if a deeper review
+seems worth it, say so at the end.
 - Any other session model: read its entry in the `prompt-guides` skill.
 
 ## Cross-vendor workers

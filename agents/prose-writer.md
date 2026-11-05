@@ -2,7 +2,7 @@
 name: prose-writer
 description: Writes long-form prose (README and docs pages, prose inside artifacts) to the files the brief names, in the surrounding document's register. Use for writing-intensive delegation; PR and issue text stays with the session.
 tools: Read, Glob, Grep, Write, Edit, Skill, Bash
-model: claude-sonnet-4-6
+model: sonnet
 effort: medium
 ---
 

@@ -44,12 +44,13 @@ The Agent tool's model list is Claude-only, so non-Claude workers dispatch throu
 
 ## Delegation rule
 
-[`rules/subagent-delegation.md`](rules/subagent-delegation.md) loads into every session and decides four things:
+[`rules/subagent-delegation.md`](rules/subagent-delegation.md) loads into every session and decides five things:
 
-- Which dispatch: a table maps task complexity to a profile: mechanical work to `sweep`, research to `doc-researcher`, verification to `code-verifier`, planning to `plan-architect`, implementation to `clean-coder`, and so on. A built-in agent type without a profile gets an explicit `model`, never an inherited one.
+- Which dispatch: a table maps task complexity to a profile: mechanical work to `sweep`, research to `doc-researcher`, verification to `code-verifier`, planning to `plan-architect`, implementation to `clean-coder`, and so on. A named profile pins its own model and effort, so the call passes neither, and passes `effort` only when the user asks.
+- Built-in agent types: a type without a profile gets both `model` and `effort` on every call, never inherited ones. Effort comes from the table row the task matches: `low` for mechanical, `medium` for standard, `high` for judgment, and `medium` when no row matches. Model aliases (`opus`, `sonnet`, `haiku`, `fable`) track the newest model of each tier and nothing pins them.
 - How to brief: five parts in order: objective with its reason, output format and size cap, tool guidance, boundaries, inputs as paths. Every brief carries an output cap because the return lands in the session context.
 - Which surface for a vendor worker: outside Orca, always headless. Inside Orca, a visible terminal for implementation the user may want to watch, long or multi-file runs, and anything that may need steering; headless for short mechanical runs with a test oracle and for parallel fan-out. Words like "watch", "terminal", "headless", and "background" override the default, and a tie goes to visible.
-- Per-model skews: Fable delegates dependably, Opus 5 delegates too readily and gets capped, Opus 4.8 delegates too little and gets pushed to fan out.
+- Per-model skews: Fable 5.1 runs subagents in the background, keeps working while they run, and says in one line what it dispatched. Sonnet 5.5 at `xhigh` or `max` stops and reports when the work is done instead of launching reviewer subagents of its own. Any other session model falls back to its `prompt-guides` entry; that includes Opus 5.5, whose guide has no delegation guidance.
 
 ## Install
 

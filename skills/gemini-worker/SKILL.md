@@ -43,8 +43,10 @@ cd <workdir> && agy -p "<brief>" --model gemini-3.8-flash-medium \
 
 Why each flag:
 
-- `--model gemini-3.8-flash-medium`: the default tier. Effort is baked into the
-  model id; there is no effort flag. Escalate to `gemini-3.8-flash-high` only
+- `--model gemini-3.8-flash-medium`: the default tier. Effort is set by the
+  model id's suffix. agy also has `--effort low|medium|high|xhigh|max`, but
+  `--model gemini-3.8-flash-medium --effort high` exits 1 ("conflicts with
+  --effort=high"), so leave the flag out. Escalate to `gemini-3.8-flash-high` only
   after a `code-verifier` fail on the medium run. `agy models` is the source of truth for ids; trust it
   over any hardcoded name here if they disagree.
 - `--add-dir "$PWD"`: required in headless mode. Without it there is no active
@@ -106,8 +108,9 @@ never commits.
 
 ## Pitfalls
 
-- Effort is part of the model id, not a flag: `gemini-3.8-flash-medium`, not a
-  separate `--effort`.
+- Set effort through the model id (`gemini-3.8-flash-medium`), never with
+  `--effort`. `--model gemini-3.8-flash-medium --effort high` errors out;
+  without `--model` it runs, but the JSON result does not say which model ran.
 - `agy update` can change flags; re-check `agy --help` after an update, and
   trust `agy models` over any id written here.
 - Flash low is loopy (50+ shell calls on a small file, mostly re-running tests).
