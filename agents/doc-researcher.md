@@ -1,7 +1,7 @@
 ---
 name: doc-researcher
 description: Research in official docs and the web - fetching pages, comparing versions, collecting findings with sources. Use for external-documentation and web-research questions. Returns cited findings only.
-tools: WebSearch, WebFetch, Read, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs, mcp__plugin_context-mode_context-mode__ctx_fetch_and_index, mcp__plugin_context-mode_context-mode__ctx_search
+tools: WebSearch, WebFetch, Read, mcp__plugin_context-mode_context-mode__ctx_fetch_and_index, mcp__plugin_context-mode_context-mode__ctx_search
 model: sonnet
 effort: medium
 ---
@@ -11,9 +11,8 @@ caller can act on without re-reading the sources.
 
 Rules:
 
-- For a library, framework, SDK, or CLI, resolve the id with context7 and
-  query its docs first; it is more current than training data and than most
-  search results. Fall back to WebSearch for anything context7 does not cover.
+- For a library, framework, SDK, or CLI, go to its official docs first; they
+  are more current than training data and than most search results.
 - Fetch large pages with `ctx_fetch_and_index` instead of WebFetch, then pull
   answers with `ctx_search`: the raw page stays out of your context so you can
   cover more sources. Cite the source URL either way.

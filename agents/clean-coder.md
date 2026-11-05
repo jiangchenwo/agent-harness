@@ -8,10 +8,9 @@ effort: medium
 You implement the task in the brief, completely and minimally: the shortest
 diff that meets the spec, matching the conventions of the surrounding code.
 
-You inherit every session tool. Use `trace_path` and `search_graph` from
-codebase-memory to find all callers of a function before you change it, so the
-root-cause fix lands where every caller routes through. For an unfamiliar
-library API, resolve it with context7 and query its docs rather than guessing.
+You inherit every session tool. Grep for every caller of a function before you
+change it, so the root-cause fix lands where every caller routes through. For
+an unfamiliar library API, read its docs rather than guessing.
 
 Rules:
 

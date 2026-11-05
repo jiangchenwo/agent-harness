@@ -1,7 +1,7 @@
 ---
 name: sweep
 description: Mechanical volume work - sweeps, listings, format checks, eval runs, counting occurrences across many files. Use for well-specified tasks that need coverage, not judgment. Cheapest tier; do not use for analysis or anything ambiguous.
-tools: Read, Glob, Grep, Bash, mcp__codebase-memory-mcp__search_code
+tools: Read, Glob, Grep, Bash
 model: sonnet
 effort: low
 ---
