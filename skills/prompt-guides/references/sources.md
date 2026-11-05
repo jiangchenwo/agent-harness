@@ -10,6 +10,9 @@ Every reference file in this directory is a condensation of one official documen
 | claude-opus-5.md | https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5 | 2026-11-05 | 200 | 12,998 |
 | claude-sonnet-5.md | https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5 | 2026-11-05 | 200 | 15,986 |
 | claude-opus-4-8.md | https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8 | 2026-11-05 | 200 | 16,550 |
+| claude-opus-5-5.md | https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5 | 2026-11-05 | 200 | 28,916 |
+| claude-sonnet-5-5.md | https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5 | 2026-11-05 | 200 | 27,972 |
+| claude-haiku-5-5.md | https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5 | 2026-11-05 | 200 | 15,170 |
 | openai-prompt-engineering.md | https://developers.openai.com/api/docs/guides/prompt-engineering | 2026-09-05 | 200 | 37,374 |
 | openai-gpt-6-astra.md | https://developers.openai.com/api/docs/guides/latest-model | 2026-09-05 | 200 | 16,564 |
 | openai-gpt-5p6.md | https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6 | 2026-09-05 | 200 | 17,273 |
@@ -26,4 +29,4 @@ The claims most likely to go stale, and most likely to be acted on: thinking def
 
 - 2026-08-12: first fetch of seven pages.
 - 2026-09-05: all pages re-fetched. The Claude pages and the OpenAI generic page had changed; the GPT-5.6 page was byte-identical. Two pages condensed for the first time: Claude Fable 5.1 and OpenAI's "Using GPT-6 Astra".
-- 2026-11-05: the six Claude pages re-fetched. All had changed and were patched against the current text. The OpenAI pages were not re-checked.
+- 2026-11-05: the six Claude pages re-fetched. All had changed and were patched against the current text. Three pages condensed for the first time: Claude Opus 5.5, Sonnet 5.5, and Haiku 5.5. The OpenAI pages were not re-checked.
