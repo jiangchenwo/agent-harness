@@ -1,10 +1,10 @@
 # Prompting Claude Sonnet 5 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5
-- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
-- Covers: the prompting patterns specific to Claude Sonnet 5. The page defers capabilities and API changes to the What's New page, and techniques that apply across all current Claude models to the best-practices page.
+- Fetched: 2026-11-05. Append `.md` to the URL for the raw Markdown source.
+- Covers: the prompting patterns specific to Claude Sonnet 5. The page links to the Claude Sonnet 5 overview for the model's specifications, and to the best-practices page for techniques that apply across all current Claude models.
 
-Claude Sonnet 5 has particular strengths in coding and agentic tasks and performs well out of the box on existing Claude Sonnet 4.6 prompts. API changes from 4.6: adaptive thinking on by default, sampling parameters not accepted, manual extended thinking removed, and a new tokenizer.
+Claude Sonnet 5 has particular strengths in coding and agentic tasks and performs well out of the box on existing Claude Sonnet 4.6 prompts.
 
 ## Response length and verbosity
 
@@ -46,7 +46,7 @@ Sonnet 5 interprets prompts literally and explicitly, particularly at lower effo
 
 ## Tone and writing style
 
-Prose style may shift from 4.6; re-evaluate style prompts against the new baseline (e.g. "Use a warm, collaborative tone. Acknowledge the user's framing before answering."). **Setting `temperature`, `top_p`, or `top_k` to a non-default value returns a 400 error**, which is new for Sonnet-class models. Remove these parameters when migrating; steer tone and variety through the system prompt.
+Prose style may shift from 4.6; re-evaluate style prompts against the new baseline (e.g. "Use a warm, collaborative tone. Acknowledge the user's framing before answering."). **Setting `temperature`, `top_p`, or `top_k` returns a 400 error**, which is new for Sonnet-class models. Remove these parameters when migrating; steer tone and variety through the system prompt.
 
 ## Design and frontend defaults
 
@@ -71,4 +71,4 @@ Usable even without an actual second step. If you do want single-pass self-filte
 
 ## Computer use
 
-Sonnet 5 supports the `computer_toolset_20260801` toolset (Claude API and Google Cloud) and the earlier `computer_20251124` tool version. On the Claude API and Google Cloud it also supports the browser use tool (`browser_toolset_20260801`) for tasks inside webpages. Resolution up to 2576px / 3.75MP. Internal testing: 1080p balances performance and cost; 720p or 1366×768 are strong lower-cost options. Test your own settings; effort tuning helps here too.
+Sonnet 5 supports the `computer_toolset_20260801` toolset and the `computer_20251124` tool version. It also supports the browser use tool (`browser_toolset_20260801`) for tasks inside webpages. Resolution up to 2576px / 3.75MP. Internal testing: 1080p balances performance and cost; 720p or 1366×768 are strong lower-cost options. Test your own settings; effort tuning helps here too.
