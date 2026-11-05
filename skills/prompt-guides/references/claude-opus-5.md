@@ -1,15 +1,15 @@
 # Prompting Claude Opus 5 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5
-- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
-- Covers: the prompting patterns specific to Claude Opus 5. The page defers capabilities and API changes to the What's New page, and techniques that apply across all current Claude models to the best-practices page.
+- Fetched: 2026-11-05. Append `.md` to the URL for the raw Markdown source.
+- Covers: the prompting patterns specific to Claude Opus 5. The page links to the Claude Opus 5 overview for the model's specifications, and to the best-practices page for techniques that apply across all current Claude models.
 
-Claude Opus 5 is built for complex agentic coding and enterprise work, with particular strengths in long-horizon agentic tasks. It performs well out of the box on existing Claude Opus 4.8 prompts. API changes from 4.8: thinking is on by default, and disabling thinking is capped at `high` effort.
+Claude Opus 5 is built for complex agentic coding and enterprise work, with particular strengths in long-horizon agentic tasks. It performs well out of the box on existing Claude Opus 4.8 prompts.
 
-## Capability improvements relevant to prompting
+## Capability improvements
 
-- **Agentic coding:** strongest on difficult tasks (multi-file features, larger refactors, end-to-end work). Completes full tasks rather than leaving stubs, and performs best given the complete task specification up front and left to run.
-- **Code review and bug-finding:** high precision and recall, holding at lower effort. If your review prompt says "only report high-severity issues" or "be conservative," the model follows it literally and reports less; ask it to report everything and filter in a separate pass instead.
+- **Agentic coding:** strongest on difficult tasks (multi-file features, larger refactors, end-to-end work). Completes full tasks rather than leaving stubs, and performs best given the complete task specification up front and left to run. It also performs well on easier tasks such as single-turn edits, where the difference from prior models is smaller.
+- **Code review and bug-finding:** high precision and recall: it finds real bugs at a high rate per pass, and its additional findings are mostly real issues rather than false positives. Accuracy holds at lower effort, which supports a fast pass at review time and a more thorough pass later. If your review prompt says "only report high-severity issues" or "be conservative," the model follows it literally and reports less; ask it to report everything and filter in a separate pass instead.
 - **Efficiency at lower effort:** `low` and `medium` effort produce strong quality at a fraction of the tokens and latency. Start at the default (`high`), then use `low`/`medium` liberally as the primary control for cost and latency wherever quality holds; step up to `xhigh` for demanding coding and agentic work. Re-run an effort sweep if you carried defaults over from a prior model.
 - **Vision:** strong on charts, documents, diagrams, and UI replication. Re-validate prompt-side vision workarounds tuned for prior models. Vision is strongest with tools to iteratively analyze, crop, and visually verify; tool use is a more cost-effective lever than thinking alone.
 - **Long context:** 1M-token window as both default and maximum; instruction following, tool calling, and reasoning stay consistent throughout.
@@ -52,7 +52,7 @@ Opus 5 delegates to subagents more readily than prior models. Delegation pays on
 
 > Delegate to a subagent only for large tasks that are genuinely independent and parallelizable, such as a wide multi-file investigation. Do not delegate work you can finish yourself in a handful of tool calls, and do not use subagents to verify or double-check your own work. If one subagent can complete the task, use one rather than several, and keep spawn counts low.
 
-If the harness is Claude Code or the Claude Agent SDK, the deterministic caps are the `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` and `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` environment variables and the SDK's `max_budget_usd` option. They require Claude Code 2.1.217 or later, so update a pinned SDK before pointing it at Opus 5. Claude Code adds a delegation instruction of its own on Opus 5 only under its `claude_code` system prompt preset; with a custom or omitted system prompt, add one yourself, such as the sample above.
+If the harness is Claude Code or the Claude Agent SDK, the deterministic caps are the `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` and `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` environment variables and the SDK's `max_budget_usd` (TypeScript: `maxBudgetUsd`) option. Older versions of Claude Code don't have them, so update Claude Code and any pinned SDK before pointing your harness at Opus 5. Claude Code adds a delegation instruction of its own on Opus 5 only under its `claude_code` system prompt preset; with a custom or omitted system prompt, add one yourself, such as the sample above.
 
 ## Self-correction
 
@@ -64,7 +64,7 @@ It also narrates corrections more than prior models. To limit that to correction
 
 ## Running with thinking disabled
 
-Thinking is on by default and can be disabled only at effort `high` or below. With thinking disabled, two artifacts can appear; the primary mitigation for both is to keep thinking enabled and lower effort instead (thinking on at `low` effort usually beats thinking off at similar cost):
+Thinking is on by default and can be disabled only at effort `high` or below. A request that combines `thinking: {"type": "disabled"}` with effort `xhigh` or `max` returns a 400 error. With thinking disabled, two artifacts can appear; the primary mitigation for both is to keep thinking enabled and lower effort instead (thinking on at `low` effort usually beats thinking off at similar cost):
 
 - **Tool calls as text:** the model occasionally writes a tool call into user-facing text instead of a structured `tool_use` block. The call never runs, and the leaked text pollutes later turns. Most common on tool-heavy workloads such as search.
 - **Internal XML tags in output:** `<thinking>` or other internal tags can leak into visible responses. If your system prompt tells the model not to think or not to reason, remove that rule; it increases tag leakage.
@@ -74,3 +74,7 @@ If thinking must stay disabled, one combined instruction mitigates both:
 > When you use a tool, you may say a brief sentence first. If no tool can express what the user asked for, say so instead of guessing. Do not include internal or system XML tags in your response.
 
 Instructions that call out thinking tags by name are less effective than this general form, so avoid naming them.
+
+## Reasoning in the response
+
+Prompts, skills, and tool descriptions that ask Opus 5 to write out its thinking or reasoning, verbatim or in a fixed format, might be declined with the `reasoning_extraction` refusal category. Ask instead for a short explanation of the answer or a summary of the actions taken. If you need the reasoning itself, keep thinking on and read the summarized thinking blocks (`display: "summarized"`).

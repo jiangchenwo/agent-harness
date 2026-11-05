@@ -1,10 +1,12 @@
 # Prompting Claude Opus 4.8 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8
-- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
-- Covers: the prompting patterns specific to Claude Opus 4.8. The page defers the API changes of moving to Opus 5 to the migration guide, and techniques that apply across all current Claude models to the best-practices page.
+- Fetched: 2026-11-05. Append `.md` to the URL for the raw Markdown source.
+- Covers: the prompting patterns specific to Claude Opus 4.8. The page defers the API changes of moving from Opus 4.8 to Opus 5.5 to "Migrating to Claude Opus 5.5 from Claude Opus 4.8", and techniques that apply across all current Claude models to the best-practices page.
 
 Claude Opus 4.8 has particular strengths in long-horizon agentic work, knowledge work, vision, and memory tasks. It performs well out of the box on existing Claude Opus 4.7 prompts.
+
+For the API parameter changes since Opus 4.7 (1M context window default and mid-conversation system messages), the page points to the Opus 5.5 migration guide's "Migrating from Claude Opus 4.7" section, which covers the same changes on the way to Opus 5.5; Opus 4.8 shares these behaviors.
 
 ## Response length and verbosity
 
@@ -23,6 +25,8 @@ Start with `xhigh` effort for coding and agentic use cases; use a minimum of `hi
 Opus 4.8 respects effort strictly, especially at the low end: at `low`/`medium` it scopes work to what was asked. Under-thinking risk on moderately complex tasks at `low`. If you see shallow reasoning, raise effort rather than prompting around it; if `low` must stay: "This task involves multistep reasoning. Think carefully through the problem before responding."
 
 **Thinking is off unless you explicitly set `thinking: {type: "adaptive"}`.** Triggering is steerable once enabled. To damp: "Thinking adds latency and should only be used when it will meaningfully improve answer quality — typically for problems that require multistep reasoning. When in doubt, respond directly."
+
+Conversely, if you're running hard workloads at `medium` and seeing under-thinking, the first lever is to raise effort. If you need finer control, prompt for it directly.
 
 At `max`/`xhigh` effort, set a large max output token budget so the model has room to think and act across subagents and tool calls. Start at 64k tokens and tune.
 
@@ -50,25 +54,27 @@ Tends toward a direct, opinionated style with minimal validation-forward phrasin
 
 ## Design and frontend defaults
 
-Opus 4.8 has a persistent default house style: warm cream/off-white backgrounds (~#F4F1EA), serif display type (Georgia, Fraunces, Playfair), italic word-accents, terracotta/amber accent. Reads well for editorial/hospitality/portfolio; feels off for dashboards, dev tools, fintech, healthcare, enterprise. Generic instructions ("don't use cream") shift it to a different fixed palette rather than producing variety. Two reliable approaches:
+Opus 4.8 has a persistent default house style: warm cream/off-white backgrounds (~#F4F1EA), serif display type (Georgia, Fraunces, Playfair), italic word-accents, terracotta/amber accent. Reads well for editorial/hospitality/portfolio; feels off for dashboards, dev tools, fintech, healthcare, enterprise. The default appears in slide decks and web UIs. Generic instructions ("don't use cream") shift it to a different fixed palette rather than producing variety. Two reliable approaches:
 
 1. **Specify a concrete alternative.** The model follows explicit specs (palette hexes, radius, typography, structure, transitions) precisely.
-2. **Have the model propose options before building:** "Before building, propose 4 distinct visual directions tailored to this brief (each as: bg hex / accent hex / typeface — one-line rationale). Ask the user to pick one, then implement only that direction."
+2. **Have the model propose options before building.** This breaks the default and gives users control. If you previously relied on `temperature` for design variety, use this approach; it produces meaningfully different directions across runs: "Before building, propose 4 distinct visual directions tailored to this brief (each as: bg hex / accent hex / typeface — one-line rationale). Ask the user to pick one, then implement only that direction."
 
 Opus 4.8 needs less anti-slop prompting than earlier models; this short snippet suffices alongside the variety approaches: `<frontend_aesthetics>NEVER use generic AI-generated aesthetics like overused font families (Inter, Roboto, Arial, system fonts), cliched color schemes (particularly purple gradients on white or dark backgrounds), predictable layouts and component patterns, and cookie-cutter design that lacks context-specific character. Use unique fonts, cohesive colors and themes, and animations for effects and micro-interactions.</frontend_aesthetics>`
 
 ## Interactive coding products
 
-Opus 4.8 uses more tokens in interactive multi-turn settings, primarily because it reasons more after user turns (improving long-horizon coherence at token cost). To maximize performance and efficiency: `xhigh` or `high` effort, autonomous features like an auto mode, fewer required human interactions, and a well-specified first turn (task, intent, constraints upfront). Ambiguous prompts drip-fed over turns reduce token efficiency and sometimes performance.
+Opus 4.8 uses more tokens in interactive multi-turn settings, primarily because it reasons more after user turns (improving long-horizon coherence at token cost). To maximize performance and efficiency: `xhigh` or `high` effort, autonomous features like an auto mode, fewer required human interactions, and a well-specified first turn (task, intent, constraints upfront). Because Opus 4.8 is more autonomous than prior models, this usage pattern helps to maximize performance. Ambiguous prompts drip-fed over turns reduce token efficiency and sometimes performance.
 
 ## Code review harnesses
 
-Meaningfully better at finding bugs than prior models (higher recall and precision internally), but a harness tuned for an earlier model may show lower recall. That is a harness effect. "Only report high-severity issues" / "be conservative" / "don't nitpick" are followed faithfully: same investigation depth, fewer reported findings. Recommended language:
+Meaningfully better at finding bugs than prior models (higher recall and precision internally), but a harness tuned for an earlier model may show lower recall. That is a harness effect. "Only report high-severity issues" / "be conservative" / "don't nitpick" are followed faithfully: same investigation depth, fewer reported findings. Precision typically rises, but measured recall can fall even though the underlying bug-finding ability has improved. Recommended language:
 
 > Report every issue you find, including ones you are uncertain about or consider low-severity. Do not filter for importance or confidence at this stage - a separate verification step will do that. Your goal here is coverage: it is better to surface a finding that later gets filtered out than to silently drop a real bug. For each finding, include your confidence level and an estimated severity so a downstream filter can rank them.
+
+This prompt can be used without an actual second step, but moving confidence filtering out of the finding step often helps. If your harness has a separate verification, deduplication, or ranking stage, tell the model explicitly that its job at the finding stage is coverage rather than filtering.
 
 For single-pass self-filtering, set a concrete bar: "report any bugs that could cause incorrect behavior, a test failure, or a misleading result; only omit nits like pure style or naming preferences." Validate on your evals.
 
 ## Computer use
 
-Opus 4.8 supports the `computer_toolset_20260801` toolset (Claude API and Google Cloud) and the earlier `computer_20251124` tool version. On the Claude API and Google Cloud it also supports the browser use tool (`browser_toolset_20260801`) for tasks inside webpages. Works across resolutions up to 2576px / 3.75MP. 1080p balances performance and cost; 720p or 1366×768 for cost-sensitive workloads. Test your own settings; effort tuning helps.
+Opus 4.8 supports the `computer_toolset_20260801` toolset and the `computer_20251124` tool version. It also supports the browser use tool (`browser_toolset_20260801`) for tasks inside webpages. Works across resolutions up to 2576px / 3.75MP. 1080p balances performance and cost; 720p or 1366×768 for cost-sensitive workloads. Test your own settings; effort tuning helps.

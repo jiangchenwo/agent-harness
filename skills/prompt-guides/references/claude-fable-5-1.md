@@ -1,8 +1,8 @@
 # Prompting Claude Fable 5.1 (official guide, condensed)
 
 - Source: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1
-- Fetched: 2026-09-05. Append `.md` to the URL for the raw Markdown source.
-- Covers: Claude Fable 5.1 and Claude Mythos 5.1. The page is organized by observed symptom; existing Fable 5 prompts should perform well without changes, but a handful of behavioral differences are worth knowing about.
+- Fetched: 2026-11-05. Append `.md` to the URL for the raw Markdown source.
+- Covers: Claude Fable 5.1 and Claude Mythos 5.1. The page defers the model's capabilities, API changes, pricing, and availability to "What's new in Claude Fable 5.1", and techniques that apply across Claude models to the best-practices page. It is organized by observed symptom; existing Fable 5 prompts should perform well without changes, but a handful of behavioral differences are worth knowing about.
 
 | Symptom | Section |
 |---------|---------|
@@ -25,6 +25,8 @@
 
 Fable 5.1 runs safety classifiers and can return `stop_reason: "refusal"`. See the "Reduce safeguard false positives" section and the Refusals, fallback, and billing page.
 
+Prompts, skills, and tool descriptions that ask the model to write its thinking or reasoning might be declined with the `reasoning_extraction` category. Ask for a short explanation or a summary of the actions taken instead, or read the reasoning from summarized thinking blocks (`display: "summarized"`).
+
 ## Consider all effort levels
 
 Effort is the primary control for trading off intelligence, latency, and cost. Start at `high` (the default), then test `low`, `medium`, `xhigh`, and `max` against your own evals. Effort level names do not correspond to the same amount of thinking across models, so re-run the sweep even if you already ran one on Fable 5.
@@ -35,7 +37,7 @@ Two effort-specific behaviors have their own sections: at `low`, the model calls
 
 ## Ask for user-facing progress updates
 
-Fable 5.1 writes fewer user-facing updates during long tool-calling turns than Fable 5 does. The gap is more pronounced at higher effort and in longer tool chains.
+Fable 5.1 writes fewer user-facing updates during long tool-calling turns than Fable 5 does. The gap is more pronounced at higher effort and in longer tool chains. Users see the agent go quiet for minutes at a time, or a final message that covers only the last step rather than the whole task.
 
 First, check that your client receives progress updates at all. Short notes between tool calls come back as progress-update `thinking` blocks, which are empty under the default `thinking.display` of `"omitted"`. Set `display: "updates"` (beta, `thinking-display-updates-2026-08-18` header) and render each non-empty `thinking` block as a status line, or set `"summarized"` to receive them with summarized reasoning.
 
@@ -55,7 +57,7 @@ In coding and computer-use loops, Fable 5.1 may issue independent tool calls one
 
 > First privately list what you need next; then request every item that doesn't depend on another's result in this one response.
 
-Append a fresh copy of this nudge after each set of tool results as a turn-scoped system message: a `role: "system"` entry in `messages` with `clear_at: "next_user_message"`. The beta header is `mid-conversation-system-clear-at-2026-08-21`. Leave earlier copies in the array byte-for-byte; the API clears them so the model reads only the newest copy and they cost no input tokens. Deleting or rewriting earlier entries restarts the prompt cache and invalidates thinking blocks that follow them.
+Append a fresh copy of this nudge after each set of tool results as a turn-scoped system message: a `role: "system"` entry in `messages` with `clear_at: "next_user_message"`. The beta header is `mid-conversation-system-clear-at-2026-08-21`. Leave earlier copies in the array byte-for-byte; the API clears them so the model reads only the newest copy and they cost no input tokens. Deleting or rewriting earlier entries is an edit to earlier turns: it invalidates the thinking blocks that came after them.
 
 Without the beta, place the sentence in a text block after the `tool_result` blocks in the same user message instead.
 
@@ -63,17 +65,17 @@ See the source page for per-language code samples showing the full loop structur
 
 ## Keep the conversation history append-only
 
-Append each assistant turn exactly as the API returned it, thinking blocks included, and do not edit earlier turns between requests. For accounts created on or after August 31, 2026, thinking blocks are valid only in the exact conversation that produced them: a request that replays a thinking block after its prefix (system prompt, tool list, or any earlier message) has changed returns a 400, or drops the affected blocks if you set `thinking.block_binding.prefix_mismatch_behavior: "drop_block"` (beta, `thinking-binding-controls-2026-08-01` header). Future models are expected to enforce this check for all accounts.
+Append each assistant turn exactly as the API returned it, thinking blocks included, and do not edit earlier turns between requests. A thinking block is valid only while everything before it is unchanged: the system prompt, the tool list, and every earlier message. To choose what happens to a block that fails the prefix check, set `thinking.block_binding.prefix_mismatch_behavior` (beta, `thinking-binding-controls-2026-08-01` header). With `"error"`, the API rejects the request with a 400 error; with `"drop_block"`, it drops the invalid blocks. For requests that don't set it, see "When `prefix_mismatch_behavior` is unset" (https://platform.claude.com/docs/en/build-with-claude/preserved-thinking#enforcement).
 
-The edits that trip the check are the same ones that restart the prompt cache: injecting and removing per-turn reminders, summarizing older turns in place, or changing the system prompt mid-session. Send per-turn reminders as turn-scoped system messages, change instructions or tools with a mid-conversation system message instead of rewriting `system` or `tools`, and let server-side compaction or context editing do any trimming.
+Most history edits that trip the prefix check also restart the prompt cache: injecting and removing per-turn reminders, summarizing older turns in place, or changing the system prompt mid-session. Send per-turn reminders as turn-scoped system messages, change instructions or tools with a mid-conversation system message instead of rewriting `system` or `tools`, and let server-side compaction or context editing do any trimming.
 
-For client-side compaction, the simplest shape is to replace the whole history with one summary message plus the new user turn and replay nothing else: no thinking blocks carry over, so nothing fails. Because cache reads are cheaper on Fable 5.1, compacting early to save cost may no longer be the right tradeoff, so experiment with later compaction points.
+For client-side compaction, the simplest shape is to replace the whole history with one summary message plus the new user turn and replay nothing else: no thinking blocks carry over, so nothing fails, and the model thinks afresh on the compacted conversation. Cache reads on Fable 5.1 cost $0.25 USD per million tokens, 2.5 percent of the input price. Compacting early to save cost can be the wrong tradeoff between cost and intelligence, so experiment with later compaction points.
 
 To find edits your harness already makes, run a session with `prefix_mismatch_behavior: "drop_block"` and log `input_transformations`, or capture exact requests over a few normal turns and confirm that consecutive requests are byte-identical up to appended turns.
 
 ## Writing density
 
-Fable 5.1's prose is sometimes denser than Fable 5's: sentences run longer with fewer paragraph breaks. An instruction that names the anti-pattern helps:
+Fable 5.1's prose is sometimes denser than Fable 5's: sentences run longer with fewer paragraph breaks. An instruction that defines the anti-pattern, mannered prose, helps. Add it to a user message (preferred) or the system prompt:
 
 > Mannered prose substitutes metaphor and flourish for direct statement. Instead of "a parameter worth varying," the mannered writer produces "a dial worth turning." Instead of "this point still matters," they write "this point earns its keep." The phrases exist to display the writer, not to convey the idea, and readers can tell. That is why mannered prose irritates: it makes the reader work harder so the writer can perform. It is also imprecise. Metaphors drag in connotations the writer did not choose and cannot control. The fix is to say what you mean. When a literal phrase is available, use it.
 
@@ -89,7 +91,19 @@ Fable 5.1 uses bold less and is less likely to reach for headers, lists, or quot
 
 ## Quoting retrieved sources
 
-Fable 5.1 is more likely than Fable 5 to reproduce passages of source text without marking them as quotations. Adding one complete example of a correct response to the system prompt addresses this: the user's request, the response, and a rationale sentence. The example in the source page shows the model using tool calls, synthesizing across two outlets in its own indirect speech, and quoting only sparingly with attribution. Replace the `[web_search: ...]` lines in the example with your own tool's name.
+When summarizing documents, Fable 5.1 is more likely than Fable 5 to reproduce passages of source text without marking them as quotations. Add one complete example of a correct response to the system prompt: the user's request, the response, and a sentence explaining why the response is correct.
+
+> \<example\>
+> \<user\>look up how the Riverton Ledger and the Coast Dispatch each covered the Harbor Bridge closure and compare their reporting\</user\>
+> \<response\>
+> [web_search: Harbor Bridge closure Riverton Ledger]
+> [web_search: Harbor Bridge closure Coast Dispatch]
+> Both outlets agree on the basics: the bridge closed on March 3 after inspectors found cracked welds, and the state expects repairs to take about eight months. Where they differ is emphasis. The Ledger treats it as a local-economy story. The Dispatch frames it as a funding failure; its editorial calls the closure "entirely foreseeable." Read together, the Ledger explains who is affected now and the Dispatch explains how it came to this — neither account alone gives the whole picture.
+> \</response\>
+> \<rationale\>CORRECT: The response is organized around where the two outlets agree and differ, not as a walk through either article. Each outlet's reporting is conveyed in one or two sentences of the assistant's own indirect speech. One short marked phrase from one source; every other claim is reworded. The response is still specific and complete.\</rationale\>
+> \</example\>
+
+Replace the two `[web_search: ...]` lines with your own tool's name, so the model reads them as templated tool output rather than literal text to emit.
 
 ## Finish the whole task
 
@@ -105,7 +119,7 @@ The first:
 >
 > Before running a command that changes system state (such as restarts, deletes, or config edits), check that the evidence actually supports that specific action. A signal that pattern-matches to a known failure may have a different cause.
 
-The opening sentence carries much of the effect; keep it as written. If your product needs the model to stop for specific confirmations, add a sentence after it listing them.
+The opening sentence carries much of the effect; keep it as written. If your product needs the model to stop for specific confirmations, add a sentence after it listing them. This block can also make the model less likely to ask about ambiguous requests, so check that trade-off on your own tasks.
 
 The second:
 
@@ -146,7 +160,7 @@ Fable 5.1's safety classifiers produce fewer false positives than Fable 5's did 
 
 ## Prefer targeted edits over whole-file rewrites
 
-Fable 5.1 is more likely than Fable 5 to rewrite an entire file rather than make a targeted edit. The resulting file is usually the same, but a rewrite costs more output tokens and time unless the file is short or most of it is changing. Append to the system prompt or first user message:
+Fable 5.1 is more likely than Fable 5 to rewrite an entire file rather than make a targeted edit. The resulting file is usually the same, but a rewrite costs more output tokens and time unless the file is short or most of it is changing. With the instruction, Fable 5.1 behaves like Fable 5 on small and medium changes. Append to the system prompt or first user message:
 
 > The number of tokens used to edit files is best minimized, all else being equal. Therefore, when it will not affect the end result, try to surgically edit a file rather than rewrite the entire thing.
 
@@ -154,7 +168,7 @@ Fable 5.1 is more likely than Fable 5 to rewrite an entire file rather than make
 
 At `xhigh` and especially `max`, Fable 5.1 can think for longer before writing its reply. When a request asks for a long deliverable, it may draft much of that deliverable in thinking and then write it out again as the reply. The simplest approach: run such requests at `high` and move to `xhigh` or `max` only where you have measured a quality gain.
 
-If you do run them at `xhigh` or `max`, set `max_tokens` to leave room for both the thinking and the reply, not just the expected reply length. Then append to the user message, replacing `[max_tokens]` with the actual value (for example, 64,000):
+If you do run them at `xhigh` or `max`, set `max_tokens` to leave room for both the thinking and the reply, not just the expected reply length. Then append the following note to the end of the user message; it makes the thinking much shorter on prose and code requests. Replace `[max_tokens]` with the actual value (for example, 64,000):
 
 > Everything produced in one reply, including any reasoning or drafting done before the reply, counts toward a single limit of about [max_tokens] tokens. If that limit is reached before the reply is finished, the person receives a cut-off response and has to start over. Composing an entire output or deliverable in full as reasoning and then again as a reply would double the length of the turn without improving the result, so don't do that.
 >
@@ -166,4 +180,4 @@ On coding tasks, letting the lead agent continue while subagents run lowers aver
 
 ## Give vision work tools to crop and zoom
 
-Fable 5.1 does its best work on complex visual inputs such as dense charts when it can iteratively analyze, crop, and verify what it sees. Run it as an agent with access to a container holding the raw images and basic image-processing libraries (PIL, OpenCV) pre-installed. If a container is too much overhead, an image-cropping tool alone delivers most of the uplift: a tool that returns a chosen region of the image, cropped and enlarged, lets the model examine specific details in depth and scales test-time compute with image tokens. See the crop tool recipe in the Anthropic cookbook.
+Fable 5.1 does its best work on complex visual inputs such as dense charts when it can iteratively analyze, crop, and verify what it sees. Run it as an agent with access to a container holding the raw images or videos and basic image-processing libraries (PIL, OpenCV) pre-installed. If a container is too much overhead, an image-cropping tool alone delivers most of the uplift: a tool that returns a chosen region of the image, cropped and enlarged, lets the model examine specific details in depth and scales test-time compute with image tokens. The crop tool recipe (https://platform.claude.com/cookbook/multimodal-crop-tool) has a working definition.

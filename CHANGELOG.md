@@ -3,6 +3,28 @@
 All notable changes to this repository are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.0] - 2026-11-05
+
+### Added
+
+- `prompt-guides`: references for Claude Opus 5.5, Sonnet 5.5, and Haiku 5.5,
+  each condensed from its official prompting page. The router has a row for
+  each, and the "Why the per-model files matter" section gains a bullet for
+  each new file.
+
+### Changed
+
+- `prompt-guides`: the six existing Claude references were re-fetched on
+  2026-11-05 and patched against the current pages. Best practices now
+  covers the 5.5 models, the new per-model thinking defaults, and the
+  medication-dosing system prompt blocks. Quotes that had been shortened
+  are verbatim again. Claims the pages no longer make are gone, including
+  the Fable 5.1 account-date cutoff and a Claude Code version floor in the
+  Opus 5 file.
+- `prompt-guides`: one routing note now covers all three pages written as
+  changes from a predecessor (Fable 5.1, Opus 5.5, Sonnet 5.5). Where the
+  newer page is silent, the predecessor's file applies.
+
 ## [0.6.1] - 2026-11-05
 
 ### Changed
