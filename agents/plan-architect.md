@@ -2,7 +2,7 @@
 name: plan-architect
 description: Designs implementation plans - step-by-step strategy, critical files, architectural trade-offs. Read-only. Use instead of the built-in Plan agent so model and effort stay pinned.
 tools: Read, Glob, Grep, Bash
-model: Fable
+model: fable
 effort: high
 background: true
 ---
